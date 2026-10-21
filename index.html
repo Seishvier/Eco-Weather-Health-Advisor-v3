@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#06100d" />
+<title>AeroVita — Weather, Air Quality & Agri Intelligence</title>
+<meta name="description" content="AeroVita turns live weather and air-quality data into practical health and agricultural guidance — free, instant, no sign-up." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ DECORATIVE BACKGROUND ============ -->
+<div class="aurora" aria-hidden="true">
+  <span class="aurora-blob a1"></span>
+  <span class="aurora-blob a2"></span>
+  <span class="aurora-blob a3"></span>
+</div>
+
+<div class="loadbar" aria-hidden="true"></div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app-shell">
+
+  <!-- ---------- SIDEBAR ---------- -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 4c0 9-5.5 13-11 13a5 5 0 0 1 0-10c4 0 6-1 11-3Z"/>
+          <path d="M4 20c2-6 6-9 10-10"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-name">AeroVita</h1>
+        <p class="brand-tag">Weather · Air · Agri</p>
+      </div>
+      <button class="icon-btn sidebar-close" id="sidebarClose" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <nav class="nav" id="nav" aria-label="Main navigation">
+      <button class="nav-item is-active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2.2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2.2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2.2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.2"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="air">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 16h13a3 3 0 1 1-3 3"/><path d="M3 12h8"/></svg>
+        <span>Air Quality</span>
+      </button>
+      <button class="nav-item" data-view="health">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9Z"/></svg>
+        <span>Health</span>
+      </button>
+      <button class="nav-item" data-view="agri">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-7"/><path d="M12 14c0-3.3-2.7-6-6-6 0 3.3 2.7 6 6 6Z"/><path d="M12 14c0-4 3.1-7 7-7 0 4-3.1 7-7 7Z"/></svg>
+        <span>Agriculture</span>
+      </button>
+      <button class="nav-item" data-view="about">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6h.01"/></svg>
+        <span>Business</span>
+      </button>
+    </nav>
+
+    <div class="side-qr">
+      <div class="qr-frame">
+        <img id="qrSide" alt="QR code to open AeroVita on your phone" loading="lazy" />
+      </div>
+      <p>Scan to open on your phone</p>
+    </div>
+
+    <div class="side-foot">
+      <p>Live data by <strong>Open-Meteo</strong></p>
+      <p class="tiny">No API key · No database · 100% free</p>
+    </div>
+  </aside>
+
+  <!-- ---------- MOBILE SCRIM ---------- -->
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <!-- ---------- MAIN ---------- -->
+  <main class="main">
+
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="refreshBtn" aria-label="Refresh data" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 4v5h-5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-inner">
+      <div class="views" id="views">
+
+        <!-- ================= DASHBOARD ================= -->
+        <section class="view is-active" id="view-dashboard" data-title="Dashboard">
+
+          <div class="search-wrap">
+            <div class="search">
+              <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+              <input id="cityInput" type="text" placeholder="Search a city — Jakarta, Bandung, Tokyo…" autocomplete="off" spellcheck="false" aria-label="Search city" />
+              <button class="btn-ghost" id="locBtn" title="Use my location">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                <span>Locate</span>
+              </button>
+            </div>
+            <div class="suggest" id="suggest" role="listbox" aria-label="City suggestions"></div>
+          </div>
+
+          <!-- HERO -->
+          <article class="hero" id="heroCard">
+            <img class="hero-img" id="heroImg" alt="" aria-hidden="true" />
+            <div class="hero-veil"></div>
+            <div class="hero-body">
+              <div class="hero-left">
+                <p class="hero-eyebrow" id="heroEyebrow">Live conditions</p>
+                <h2 class="hero-city" id="heroCity">Locating…</h2>
+                <p class="hero-sub" id="heroSub">Fetching the latest data</p>
+              </div>
+              <div class="hero-right">
+                <div class="hero-icon" id="heroIcon"></div>
+                <div class="hero-temp"><span id="heroTemp">--</span><sup>°C</sup></div>
+                <p class="hero-cond" id="heroCond">—</p>
+              </div>
+            </div>
+            <div class="hero-strip" id="heroStrip"></div>
+          </article>
+
+          <!-- STATS -->
+          <div class="grid grid-4" id="statGrid"></div>
+
+          <!-- CHART + FORECAST -->
+          <div class="grid grid-chart">
+            <div class="card">
+              <div class="card-head">
+                <h3>Next 24 hours</h3>
+                <span class="card-meta" id="chartMeta">—</span>
+              </div>
+              <div class="chart-box" id="chartBox"></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>7-day outlook</h3>
+                <span class="card-meta" id="sunMeta">—</span>
+              </div>
+              <ul class="forecast" id="forecastList"></ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= AIR ================= -->
+        <section class="view" id="view-air" data-title="Air Quality">
+          <div class="grid grid-2">
+            <div class="card gauge-card">
+              <div class="card-head">
+                <h3>European Air Quality Index</h3>
+                <span class="pill" id="aqiPill">—</span>
+              </div>
+              <div class="gauge" id="gauge"></div>
+              <p class="gauge-note" id="aqiNote">Waiting for data…</p>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h3>Pollutant concentrations</h3>
+                <span class="card-meta">µg/m³</span>
+              </div>
+              <ul class="pollutants" id="pollutants"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>What this means for you</h3></div>
+            <div class="advice-list" id="airAdvice"></div>
+          </div>
+
+          <figure class="figure">
+            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=70" alt="Sunlight filtering through a green forest canopy" loading="lazy" />
+            <figcaption><strong>Clean air is invisible infrastructure.</strong> Forest canopies filter particulate matter and cool the air around them — which is why green cities breathe easier.</figcaption>
+          </figure>
+        </section>
+
+        <!-- ================= HEALTH ================= -->
+        <section class="view" id="view-health" data-title="Health">
+          <div class="card intro-card">
+            <div class="intro-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9Z"/></svg>
+            </div>
+            <div>
+              <h3>Personal health guidance</h3>
+              <p>Generated live from temperature, humidity, wind, UV and air quality at your location. Recommendations refresh every time the weather updates.</p>
+            </div>
+          </div>
+
+          <div class="advice-list" id="healthList"></div>
+
+          <figure class="figure">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=70" alt="Calm lake surrounded by mountains and forest" loading="lazy" />
+            <figcaption><strong>Good air, better days.</strong> Outdoor activity is safest when AQI is low, humidity is moderate and UV is below 6 — exactly what AeroVita checks for you.</figcaption>
+          </figure>
+        </section>
+
+        <!-- ================= AGRICULTURE ================= -->
+        <section class="view" id="view-agri" data-title="Agriculture">
+          <div class="card intro-card">
+            <div class="intro-ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-7"/><path d="M12 14c0-3.3-2.7-6-6-6 0 3.3 2.7 6 6 6Z"/><path d="M12 14c0-4 3.1-7 7-7 0 4-3.1 7-7 7Z"/></svg>
+            </div>
+            <div>
+              <h3>Precision agriculture advisory</h3>
+              <p>Soil moisture, rainfall forecast, wind and temperature combined into actionable field decisions — irrigation, spraying windows, frost and heat stress alerts.</p>
+            </div>
+          </div>
+
+          <div class="advice-list" id="agriList"></div>
+
+          <figure class="figure">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1400&q=70" alt="Green agricultural field under warm sunlight" loading="lazy" />
+            <figcaption><strong>Water at the right time.</strong> Irrigating before expected rainfall wastes water and leaches nutrients. Timing is the single cheapest yield upgrade a farmer has.</figcaption>
+          </figure>
+        </section>
+
+        <!-- ================= BUSINESS ================= -->
+        <section class="view" id="view-about" data-title="Business Strategy">
+
+          <div class="hero-mini">
+            <h2>From free data to a real business</h2>
+            <p>AeroVita is an entrepreneurship (PKWU) case study: how a free, open API becomes a product with a defensible unique selling proposition.</p>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <span class="kicker">01 · Problem</span>
+              <h3>Weather apps tell you the temperature. They rarely tell you what to <em>do</em>.</h3>
+              <p>Farmers still irrigate by habit. Runners still train in unhealthy air. Travellers still arrive in monsoon season. The data exists — the interpretation doesn't.</p>
+            </div>
+            <div class="card">
+              <span class="kicker">02 · Solution</span>
+              <h3>A decision layer on top of open data.</h3>
+              <p>We ingest free weather + air-quality feeds and translate them into prescriptive, human-readable actions for health and agriculture — no sensors, no hardware, no database.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="kicker">03 · Unique Selling Proposition</span>
+            <div class="usp-grid">
+              <div class="usp"><h4>Zero-cost data stack</h4><p>Open-Meteo needs no API key and no billing account, so gross margin starts near 100%.</p></div>
+              <div class="usp"><h4>Prescriptive, not descriptive</h4><p>Competitors show numbers. We show "irrigate tonight" or "don't run outside at 3pm".</p></div>
+              <div class="usp"><h4>Dual-market by design</h4><p>One engine, two buyers: personal health and precision agriculture.</p></div>
+              <div class="usp"><h4>Local-first</h4><p>City-level granularity with local language and local crops — hard for global apps to match.</p></div>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <span class="kicker">04 · Market segments</span>
+              <ul class="tick-list">
+                <li><strong>Eco-tourism</strong> — advise visitors on the best window to hike, dive or trek based on air quality and rainfall.</li>
+                <li><strong>Precision agriculture</strong> — smallholder co-ops and agronomists needing irrigation and spraying windows.</li>
+                <li><strong>Urban health</strong> — schools, outdoor sports clubs and respiratory patients.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="kicker">05 · Revenue model</span>
+              <ul class="tick-list">
+                <li><strong>Freemium</strong> — free city dashboard, paid field-level alerts via WhatsApp.</li>
+                <li><strong>B2B API</strong> — white-label advisory feed for agri-tech and travel platforms.</li>
+                <li><strong>Sponsorship</strong> — agri-input brands sponsoring seasonal recommendations.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="kicker">06 · Competitive advantage</span>
+            <p class="long-text">The moat is not the data — anyone can call the same API. The moat is the <strong>recommendation ruleset</strong>: crop-specific thresholds, local agronomic knowledge and health guidelines tuned per region. Every new region we calibrate raises switching costs and improves accuracy, creating a compounding data flywheel without owning a single sensor.</p>
+          </div>
+
+          <!-- QR BLOCK -->
+          <div class="qr-hero card">
+            <div class="qr-hero-text">
+              <span class="kicker">Share</span>
+              <h3>Scan to open AeroVita</h3>
+              <p>Point your phone camera at the code — no app install needed. The link works on any device.</p>
+              <div class="qr-actions">
+                <button class="btn-primary" id="copyLinkBtn">Copy link</button>
+                <a class="btn-ghost" id="openLinkBtn" href="#" target="_blank" rel="noopener">Open link</a>
+              </div>
+            </div>
+            <div class="qr-hero-frame">
+              <img id="qrBig" alt="QR code linking to this AeroVita page" loading="lazy" />
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <footer class="foot">
+        <p>Built with <strong>Open-Meteo</strong> · Vanilla HTML, CSS &amp; JavaScript · No database, no tracking.</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
